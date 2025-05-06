@@ -1,2 +1,1 @@
 # microfrontend-initializer
-# microfrontend-initializer
