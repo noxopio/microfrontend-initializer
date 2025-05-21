@@ -6,6 +6,14 @@ PORT=$2
 file_name="$(basename "$0")"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+
+if [ "$APP_NAME" = "." ]; then
+  APP_NAME=$(basename "$PWD")
+  USE_CURRENT_DIR=true
+else
+  USE_CURRENT_DIR=false
+fi
+
 if [ -z "$APP_NAME" ]; then
   echo "Uso: ./$file_name nombre-del-microfront [puerto]"
   exit 1
@@ -15,9 +23,10 @@ if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; th
   exit 1
 fi
 
-
-mkdir "$APP_NAME"
-cd "$APP_NAME" || exit
+if [ "$USE_CURRENT_DIR" = false ]; then
+  mkdir "$APP_NAME"
+  cd "$APP_NAME" || exit
+fi
 
 echo "Inicializando proyecto Next.js para $APP_NAME..."
 
