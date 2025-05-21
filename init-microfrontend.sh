@@ -1,17 +1,21 @@
 #!/bin/bash
 
-# Nombre del microfront como argumento
+
 APP_NAME=$1
 PORT=$2
 file_name="$(basename "$0")"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 if [ -z "$APP_NAME" ]; then
-  echo "Uso: ./$file_name nombre-del-microfront"
+  echo "Uso: ./$file_name nombre-del-microfront [puerto]"
+  exit 1
+fi
+if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
+  echo "Error: El puerto debe ser un número"
   exit 1
 fi
 
-# Crear estructura base
+
 mkdir "$APP_NAME"
 cd "$APP_NAME" || exit
 
@@ -98,7 +102,7 @@ cat <<EOF > package.json
     "@reduxjs/toolkit": "^2.2.3",
     "crypto-js": "^4.2.0",
     "next": "14.2.7",
-    
+    "pendig-fro-transversal-lib-react": "https://devopsprd.porvenir.net/artifactory/libraries/pendig-fro-transversal-lib-react/pendig-fro-transversal-lib-react-1.2.1.tgz",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-redux": "^9.1.2",
@@ -141,7 +145,7 @@ EOF
 # Crear estructura de carpetas
 mkdir -p src/pages src/components  public
 
-# Archivo index básico
+# index 
 cat <<EOF > src/pages/index.tsx
 export default function Home() {
   return <div>Microfront: $APP_NAME</div>;
@@ -153,7 +157,7 @@ export default function App({ Component, pageProps }: AppProps) {
  return <Component {...pageProps} />;
 }
 EOF
-# Crear o modificar el archivo sonar-project.properties en la carpeta templates
+# Crear sonar
 cat <<EOF >sonar-project.properties
 sonar.projectKey=$APP_NAME
 sonar.projectName=$APP_NAME
@@ -212,17 +216,30 @@ const nextConfig = {
     return config;
   },
 };
-
 module.exports = nextConfig;
-
-
 EOF
 
 cat <<EOF > .env.development.local
 NEXT_PRIVATE_LOCAL_WEBPACK=true
 NEXT_PUBLIC_URL_BACKEND_PENDIGITAL=http://localhost:$PORT/
 
+NEXT_PUBLIC_URL_POST='POST'
+NEXT_PUBLIC_URL_GET='GET'
+
 EOF
+
+
+cat <<EOF > Jenkinsfile.yaml
+sonarArgs: "-Dsonar.projectKey=$APP_NAME -Dsonar.sources=."
+pathKubernetes: "k8s/$APP_NAME-deployment.yaml"
+project: "ns-frontend-fondogeneracional"
+artifactName: "$APP_NAME"
+replicasDev: 1
+replicasPrd: 1
+
+
+EOF
+
 
 shopt -s dotglob
 
@@ -232,7 +249,6 @@ cp "$SCRIPT_DIR/templates/"* .
 # cp ../templates/README.md .
 
 shopt -u dotglob
-
 
 # npx npm-add-script -k "dev" -v "cross-env NEXT_PRIVATE_LOCAL_WEBPACK=true next dev -p $PORT "
 # npx npm-add-script -k "build" -v "next build"
