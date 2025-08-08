@@ -40,7 +40,8 @@ cat <<EOF > package.json
     "build":"next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "open:dev": "start bash -c 'npm run dev'"
   },
   "dependencies": {
     "@azure/msal-browser": "^3.6.0",
