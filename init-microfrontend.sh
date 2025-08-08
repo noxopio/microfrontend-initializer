@@ -111,7 +111,7 @@ cat <<EOF > package.json
     "@reduxjs/toolkit": "^2.2.3",
     "crypto-js": "^4.2.0",
     "next": "14.2.7",
-    "pendig-fro-transversal-lib-react": "https://devopsprd.porvenir.net/artifactory/libraries/pendig-fro-transversal-lib-react/pendig-fro-transversal-lib-react-1.2.1.tgz",
+   
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-redux": "^9.1.2",
